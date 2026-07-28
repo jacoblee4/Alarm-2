@@ -1,3 +1,10 @@
+before update
+
+
+Filter Conditions
+alarm_codeISNOTEMPTY^ORalarm_passwordISNOTEMPTY^issue_type=alarm_panel^EQ
+
+
 (function executeRule(current, previous /* null when async */) {
 
     // Validate alarm_code ONLY if it has a value
