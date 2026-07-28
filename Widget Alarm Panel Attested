@@ -233,7 +233,6 @@
 
 
 
-
 // Server Script
 
 (function() {
@@ -459,6 +458,3 @@ api.controller = function($location) {
 			return text ? new Array(text.length + 1).join('*') : '';
 		};
 	};
-
-
-
