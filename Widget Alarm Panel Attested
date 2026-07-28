@@ -1,0 +1,458 @@
+//HTML
+<div class="aw-password-widget">
+  <div class="aw-state">
+
+    <!-- ===== LOADING ===== -->
+    <div ng-if="c.state === 'loading'" class="aw-state-content">
+      <i class="fa fa-spinner fa-spin fa-2x"></i>
+      <p>Loading...</p>
+    </div>
+
+    <!-- ===== NO RECORD ===== -->
+    <div ng-if="c.state === 'no_record'" class="aw-state-content">
+      <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
+      <h2>No Record Found</h2>
+      <p>No reference record found. Please contact an administrator.</p>
+    </div>
+
+    <!-- ===== DENIED ===== -->
+    <div ng-if="c.state === 'denied'" class="aw-state-content">
+      <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
+      <h2>Access Restricted</h2>
+      <p>Only the <strong>Opened For</strong> user assigned to this work order can view this content.</p>
+    </div>
+
+    <!-- ===== NOT READY ===== -->
+    <div ng-if="c.state === 'not_ready'" class="aw-state-content">
+      <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
+      <h2>Not Yet Available</h2>
+      <p>Your alarm code and password haven't been set up yet. Please wait for your confirmation email.</p>
+    </div>
+
+    <!-- ===== ALREADY ATTESTED ===== -->
+    <div ng-if="c.state === 'already_attested'" class="aw-state-content">
+      <div class="aw-icon-wrap submitted-icon"><i class="fa fa-check-circle"></i></div>
+      <h2>Already Confirmed</h2>
+      <p>You've already confirmed receipt of your alarm code and password. For security, they can no longer be viewed from this link. If you've lost them, please contact an administrator.</p>
+    </div>
+
+    <!-- ===== INTRO / ACKNOWLEDGE ===== -->
+    <div ng-if="c.state === 'intro'" class="aw-state-content aw-form">
+      <div class="aw-header">
+        <div class="aw-icon-wrap warn-icon"><i class="fa fa-shield"></i></div>
+        <h2>Your Alarm Code &amp; Password</h2>
+        <p class="aw-subtitle" ng-if="c.location">for {{c.location}}</p>
+      </div>
+
+      <div class="aw-warn">
+        <i class="fa fa-exclamation-triangle"></i>
+        <p>This is <strong>sensitive security information</strong>. Do not share your alarm code or password with anyone. You are responsible for keeping it confidential.</p>
+      </div>
+
+      <div class="aw-acks">
+        <label class="aw-ack" ng-class="{'checked': c.ack1}">
+          <input type="checkbox" ng-model="c.ack1" />
+          <span>I understand this information is confidential and will not share it with anyone.</span>
+        </label>
+        <label class="aw-ack" ng-class="{'checked': c.ack2}">
+          <input type="checkbox" ng-model="c.ack2" />
+          <span>I understand that once I confirm, I will <strong>no longer be able to view</strong> my code and password from this link.</span>
+        </label>
+      </div>
+
+      <div class="aw-error-banner" ng-if="c.serverError">
+        <i class="fa fa-exclamation-triangle"></i> {{c.serverError}}
+      </div>
+
+      <button class="aw-submit-btn" ng-click="c.reveal()" ng-disabled="!c.canReveal()" type="button">
+        <span ng-if="!c.revealing">Confirm &amp; Reveal</span>
+        <span ng-if="c.revealing"><i class="fa fa-spinner fa-spin"></i> Confirming...</span>
+      </button>
+    </div>
+
+    <!-- ===== REVEALED ===== -->
+    <div ng-if="c.state === 'revealed'" class="aw-state-content aw-form">
+      <div class="aw-header">
+        <div class="aw-icon-wrap success-icon"><i class="fa fa-unlock-alt"></i></div>
+        <h2>Your Credentials</h2>
+        <p class="aw-subtitle" ng-if="c.location">for {{c.location}}</p>
+      </div>
+
+      <div class="aw-cred">
+        <p class="aw-cred-label">Alarm Code</p>
+        <div class="aw-cred-row">
+          <span class="aw-cred-value">{{c.showCode ? c.code : c.mask(c.code)}}</span>
+          <button class="aw-toggle-btn" ng-click="c.showCode = !c.showCode" type="button">
+            <i ng-class="c.showCode ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+            {{c.showCode ? 'Hide' : 'Show'}}
+          </button>
+        </div>
+      </div>
+
+      <div class="aw-cred">
+        <p class="aw-cred-label">Alarm Password</p>
+        <div class="aw-cred-row">
+          <span class="aw-cred-value">{{c.showPass ? c.password : c.mask(c.password)}}</span>
+          <button class="aw-toggle-btn" ng-click="c.showPass = !c.showPass" type="button">
+            <i ng-class="c.showPass ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+            {{c.showPass ? 'Hide' : 'Show'}}
+          </button>
+        </div>
+      </div>
+      <div class="aw-final-note">
+        <i class="fa fa-info-circle"></i>
+        <p>Save these now. This is the only time they will be shown. Refreshing or returning to this link will not display them again.</p>
+      </div>
+    </div>
+
+    <!-- ===== ERROR ===== -->
+    <div ng-if="c.state === 'error'" class="aw-state-content">
+      <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
+      <h2>Something Went Wrong</h2>
+      <p>Your credentials could not be displayed. Please contact an administrator for assistance.</p>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+// CSS
+.aw-password-widget {
+  font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.aw-state {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.06);
+  padding: 40px 36px;
+  text-align: center;
+}
+
+.aw-state-content { animation: aw-fade-in 0.25s ease; }
+@keyframes aw-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.aw-state h2 { font-size: 22px; font-weight: 700; color: #1a1f36; margin: 16px 0 8px; }
+.aw-state p { font-size: 15px; color: #525f7f; line-height: 1.6; margin: 0; }
+
+.aw-icon-wrap {
+  width: 68px; height: 68px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px; font-size: 32px;
+}
+.denied-icon    { background: #fff1f0; color: #f5222d; }
+.submitted-icon { background: #fff7e6; color: #fa8c16; }
+.warn-icon      { background: #fff7e6; color: #fa8c16; }
+.success-icon   { background: #f6ffed; color: #52c41a; }
+
+.aw-form { text-align: left; }
+.aw-header { text-align: center; margin-bottom: 24px; }
+.aw-subtitle { font-size: 14px; color: #8c96b0; }
+
+.aw-warn {
+  display: flex; gap: 12px; text-align: left;
+  background: #fff7e6; border: 1px solid #ffd591;
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 22px;
+}
+.aw-warn i { color: #fa8c16; font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+.aw-warn p { font-size: 14px; color: #7c5a14; margin: 0; line-height: 1.5; }
+
+.aw-acks { text-align: left; margin-bottom: 22px; }
+.aw-ack {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; border: 1.5px solid #d9dde8; border-radius: 8px;
+  margin-bottom: 10px; cursor: pointer; background: #fafbfc;
+  transition: border-color .2s, background .2s;
+}
+.aw-ack:hover { border-color: #1890ff; }
+.aw-ack.checked { border-color: #52c41a; background: #f6ffed; }
+.aw-ack input { margin: 2px 0 0; width: 17px; height: 17px; flex-shrink: 0; cursor: pointer; accent-color: #1890ff; }
+.aw-ack span { font-size: 14px; color: #3d4559; line-height: 1.5; }
+
+.aw-cred {
+  text-align: left; background: #f5f7fa; border: 1.5px solid #d9dde8;
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 14px;
+}
+.aw-cred-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: #8c96b0; margin: 0 0 6px;
+}
+.aw-cred-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.aw-cred-value {
+  font-family: "SF Mono", "Consolas", monospace; font-size: 20px; font-weight: 700;
+  color: #1a1f36; letter-spacing: .08em; word-break: break-all;
+}
+.aw-toggle-btn {
+  background: #fff; border: 1.5px solid #d9dde8; border-radius: 6px;
+  padding: 7px 12px; font-size: 13px; font-weight: 600; color: #1890ff;
+  cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center;
+  gap: 6px; transition: border-color .2s, color .2s;
+}
+.aw-toggle-btn:hover { border-color: #1890ff; }
+
+.aw-final-note {
+  display: flex; gap: 10px; text-align: left;
+  background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px;
+  padding: 12px 14px; margin-top: 8px;
+}
+.aw-final-note i { color: #f5222d; margin-top: 2px; flex-shrink: 0; }
+.aw-final-note p { font-size: 13px; color: #c0392b; margin: 0; line-height: 1.5; }
+
+.aw-error-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px;
+  padding: 10px 14px; color: #c0392b; font-size: 14px; margin-bottom: 16px;
+}
+
+.aw-submit-btn {
+  width: 100%; padding: 13px; background: #1890ff; color: #fff; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .2s, opacity .2s, transform .1s;
+}
+.aw-submit-btn:hover:not([disabled]) { background: #096dd9; transform: translateY(-1px); }
+.aw-submit-btn:active:not([disabled]) { transform: translateY(0); }
+.aw-submit-btn[disabled] { background: #bdc5d4; cursor: not-allowed; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Server Script
+
+(function() {
+
+	// Table and field constants
+	var TABLE = 'x_banun_property_0_physical_security_work_order';
+	var FIELD_CODE = 'alarm_code';
+	var FIELD_PASS = 'alarm_password';
+	var FIELD_BRANCH = 'branch';
+	var FIELD_BLDG = 'building';
+	var FIELD_OPENED = 'x_banun_bunow_al_0_opened_for';
+	var FIELD_ATTEST = 'attested';
+
+	// Instantiate the AlarmCodeHelper script include
+	var credHelper = new AlarmCodeHelper();
+
+	// Initialize data object properties
+	data.state = '';
+	data.location = '';
+	data.code = '';
+	data.password = '';
+	data.error = '';
+
+	// Validate input object
+	if (!input || typeof input !== 'object') {
+		data.state = 'no_record';
+		return;
+	}
+
+	// Extract action and sys_id from input
+	var action = input.action;
+	var sysId = input.sys_id;
+	if (!sysId) {
+		data.state = 'no_record';
+		return;
+	}
+
+	// Retrieve the work order record
+	var wo = new GlideRecord(TABLE);
+	if (!wo.get(sysId)) {
+		data.state = 'no_record';
+		return;
+	}
+
+	// Ensure only the "Opened For" user can proceed
+	if (wo.getValue(FIELD_OPENED) !== gs.getUserID()) {
+		data.state = 'denied';
+		return;
+	}
+
+	// Check if already attested
+	if (isAttested(wo)) {
+		data.state = 'already_attested';
+		return;
+	}
+
+	// Decrypt credentials using Script Include
+	var precheck = credHelper.getAlarmCredentials(sysId);
+	if (!precheck.code || !precheck.password) {
+		data.state = 'not_ready';
+		return;
+	}
+
+	// Get location display value
+	data.location = getLocation(wo);
+
+	// INIT action: show intro only, never the secret
+	if (action === 'init') {
+		data.state = 'intro';
+		return;
+	}
+
+	// REVEAL action: attest and reveal credentials
+	if (action === 'reveal') {
+		var fresh = new GlideRecord(TABLE);
+		if (!fresh.get(sysId)) {
+			data.state = 'error';
+			return;
+		}
+		if (fresh.getValue(FIELD_OPENED) !== gs.getUserID()) {
+			data.state = 'denied';
+			return;
+		}
+		if (isAttested(fresh)) {
+			data.state = 'already_attested';
+			return;
+		}
+
+		// Set attested flag to true
+		fresh.setValue(FIELD_ATTEST, true);
+		fresh.update();
+
+		// Verify attested flag before revealing credentials
+		var check = new GlideRecord(TABLE);
+		if (!check.get(sysId) || !isAttested(check)) {
+			data.state = 'error';
+			return;
+		}
+
+		// Retrieve and return credentials
+		var creds = credHelper.getAlarmCredentials(sysId);
+		data.code = creds.code;
+		data.password = creds.password;
+		data.location = getLocation(check);
+		data.state = 'revealed';
+		return;
+	}
+
+	// Default to denied state
+	data.state = 'denied';
+
+	// Helper function to check if attested
+	function isAttested(gr) {
+		var v = String(gr.getValue(FIELD_ATTEST) || '').toLowerCase();
+		return v === '1' || v === 'true';
+	}
+
+	// Helper function to get location display value
+	function getLocation(gr) {
+		var b = gr.getDisplayValue(FIELD_BLDG);
+		if (b) return b;
+		var br = gr.getDisplayValue(FIELD_BRANCH);
+		if (br) return br;
+		return '';
+	}
+})();
+
+
+
+
+
+
+
+
+
+
+
+// Clinet Script
+
+api.controller = function($location) {
+		var c = this;
+	
+		// Initial state variables
+		c.state = 'loading';
+		c.location = '';
+		c.code = '';
+		c.password = '';
+		c.ack1 = false;
+		c.ack2 = false;
+		c.revealing = false;
+		c.serverError = '';
+	
+		// Controller initialization
+		c.$onInit = function() {
+			// Get sys_id from URL or options
+			var sysId = $location.search().sys_id || c.options.sys_id || '';
+			if (!sysId) {
+				c.state = 'no_record';
+				return;
+			}
+	
+			// Call server to initialize data
+			c.server.get({
+				action: 'init',
+				sys_id: sysId
+			}).then(function(r) {
+				var d = r.data || {};
+				c.state = d.state || 'no_record';
+				c.location = d.location || '';
+			}).catch(function() {
+				c.state = 'no_record';
+			});
+		};
+	
+		// Check if reveal action can be performed
+		c.canReveal = function() {
+			return c.ack1 && c.ack2 && !c.revealing;
+		};
+	
+		// Reveal code and password
+		c.reveal = function() {
+			if (!c.canReveal()) return;
+			var sysId = $location.search().sys_id || c.options.sys_id || '';
+			c.revealing = true;
+			c.serverError = '';
+	
+			// Call server to reveal data
+			c.server.get({
+				action: 'reveal',
+				sys_id: sysId
+			}).then(function(r) {
+				c.revealing = false;
+				var d = r.data || {};
+				if (d.state === 'revealed') {
+					c.code = d.code;
+					c.password = d.password;
+					c.location = d.location || c.location;
+					c.state = 'revealed';
+				} else if (d.state === 'already_attested') {
+					c.state = 'already_attested';
+				} else {
+					c.state = d.state || 'error';
+					c.serverError = d.error || '';
+				}
+			}).catch(function() {
+				c.revealing = false;
+				c.state = 'error';
+			});
+		};
+	
+		// Flags for showing code and password
+		c.showCode = false;
+		c.showPass = false;
+	
+		// Mask text with asterisks
+		c.mask = function(text) {
+			return text ? new Array(text.length + 1).join('*') : '';
+		};
+	};
+
+
+
