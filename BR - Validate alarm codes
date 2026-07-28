@@ -4,6 +4,8 @@ before update
 Filter Conditions
 alarm_codeISNOTEMPTY^ORalarm_passwordISNOTEMPTY^issue_type=alarm_panel^EQ
 
+condition: current.alarm_code.changes() || current.alarm_password.changes()
+
 
 (function executeRule(current, previous /* null when async */) {
 
@@ -40,3 +42,4 @@ alarm_codeISNOTEMPTY^ORalarm_passwordISNOTEMPTY^issue_type=alarm_panel^EQ
     }
 
 })(current, previous);
+
