@@ -1,3 +1,10 @@
+async updated
+
+additional condtion: current.alarm_password.changes() && !current.alarm_password.nil()
+
+Filter Conditions
+issue_type=alarm_panel^request_type=add^EQ
+
 (function executeRule(current, previous /*null when async*/) {
     new x_banun_bunow_al_0.AlarmCodeHelper().propagateCredentials(current.getUniqueValue());
 })(current, previous);
