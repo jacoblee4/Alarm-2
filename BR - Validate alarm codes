@@ -1,0 +1,35 @@
+(function executeRule(current, previous /* null when async */) {
+
+    // Validate alarm_code ONLY if it has a value
+    if (!gs.nil(current.alarm_code)) {
+        var alarmCode = current.alarm_code.toString();
+
+        // Must be exactly 4 digits
+        if (!/^\d{4}$/.test(alarmCode)) {
+            current.setAbortAction(true);
+            gs.showFieldMsg(
+                'alarm_code',
+                'Alarm code must be exactly 4 digits.',
+                'error'
+            );
+            return;
+        }
+    }
+
+    // Validate alarm_password ONLY if it has a value
+    if (!gs.nil(current.alarm_password)) {
+        var alarmPassword = current.alarm_password.toString();
+
+        // Must be 4–10 letters, no special characters
+        if (!/^[A-Za-z]{4,10}$/.test(alarmPassword)) {
+            current.setAbortAction(true);
+            gs.showFieldMsg(
+                'alarm_password',
+                'Alarm Password must be 4-10 letters, no special characters.',
+                'error'
+            );
+            return;
+        }
+    }
+
+})(current, previous);
