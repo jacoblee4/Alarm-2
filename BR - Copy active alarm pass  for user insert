@@ -1,3 +1,8 @@
+Before Insert
+
+Filter Conditions
+alarm_passwordISEMPTY^request_type=add^issue_type=alarm_panel^EQ
+
 (function executeRule(current, previous /*null when async*/ ) {
     var helper = new x_banun_bunow_al_0.AlarmCodeHelper();
     var openedFor = current.getValue('x_banun_bunow_al_0_opened_for');
