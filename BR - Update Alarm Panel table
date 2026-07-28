@@ -1,3 +1,8 @@
+async updated
+
+Filter Conditions
+issue_type=alarm_panel^stateCHANGESFROM1^ORstateCHANGESFROM41^ORstateCHANGESFROM42^ORstateCHANGESFROM43^stateCHANGESTO44^ORstateCHANGESTO3^EQ
+
 (function executeRule(current, previous /*null when async*/ ) {
 	//Call script include to update the alarm codes table
     new x_banun_bunow_al_0.AlarmCodeHelper().syncAlarmCodeList(current.getUniqueValue());
