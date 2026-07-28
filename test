@@ -1,0 +1,15 @@
+Not client callabale:
+var test = Class.create();
+test.prototype = {
+    initialize: function() {
+    },
+
+    type: 'test'
+};
+
+client callabale:
+var test = Class.create();
+test.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+
+    type: 'test'
+});
