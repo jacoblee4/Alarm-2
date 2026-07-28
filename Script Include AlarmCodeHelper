@@ -1,27 +1,27 @@
 var AlarmCodeHelper = Class.create();
-AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+AlarmCodeHelper.prototype = {
+
+    initialize: function() {},
 
     // Retrieves the 'issue_at_branch' field for a given alarm code
-    getIssueAtBranch: function() {
-        var alarmCode = this.getParameter('sysparm_alarm_code');
+    getIssueAtBranch: function(alarmCode) {
         if (!alarmCode)
             return '';
 
         var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-        gr.get(alarmCode);
-        return gr.issue_at_branch;
+        if (!gr.get(alarmCode))
+            return '';
 
+        return gr.getValue('issue_at_branch');
     },
 
     // Checks if an alarm code exists for a given employee
-    hasAlarmCode: function() {
-        var employeeName = this.getParameter('sysparm_employee');
-
-        if (!employeeName)
+    hasAlarmCode: function(employee) {
+        if (!employee)
             return 'false';
 
         var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-        gr.addQuery('employee', employeeName);
+        gr.addQuery('employee', employee);
         gr.setLimit(1);
         gr.query();
 
@@ -36,6 +36,9 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         for (var i = 0; i < maxAttempts; i++) {
             var code = this._generateCode();
 
+            if (!code)
+                continue;
+
             if (!woCodes[code] && !this._codeExists(code)) {
                 return code;
             }
@@ -43,10 +46,8 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return "ERROR";
     },
 
-    //Checks if an alarm code is already in use by another employee
-    checkCodeInUse: function() {
-        var code = this.getParameter('sysparm_alarm_code');
-        var openedFor = this.getParameter('sysparm_opened_for');
+    // Checks if an alarm code is already in use by another employee
+    checkCodeInUse: function(code, openedFor) {
 
         // Guard clause
         if (!code || !/^\d{4}$/.test(code)) {
@@ -122,7 +123,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
                 continue;
             }
 
-            // ---- Rule: block ≤ 2 unique digits ----
+            // ---- Rule: block <= 2 unique digits ----
             var unique = {};
             for (var i = 0; i < digits.length; i++) {
                 unique[digits[i]] = true;
@@ -140,8 +141,10 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return null;
     },
 
-
     _codeExists: function(code) {
+        if (!code)
+            return false;
+
         // Check if the code exists in the alarm codes table
         var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
         gr.addQuery('alarm_code', code);
@@ -150,7 +153,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return gr.hasNext();
     },
 
-    //Looks up an employee's existing alarm record and decrypts code/password.
+    // Looks up an employee's existing alarm record and decrypts code/password.
     getCredentialsByEmployee: function(employee) {
         var result = {
             found: false,
@@ -174,7 +177,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return result;
     },
 
-    //Decrypts alarm code/password for a work order record.
+    // Decrypts alarm code/password for a work order record.
     getAlarmCredentials: function(sysId) {
         var result = {
             code: '',
@@ -192,11 +195,18 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return result;
     },
 
-    firePasswordEmailEvent: function() {
+    // Fires the password request notification event for a work order
+    firePasswordEmailEvent: function(sysId) {
+        if (!sysId)
+            return 'error';
+
         var gr = new GlideRecord('x_banun_property_0_physical_security_work_order');
-        if (gr.get(this.getParameter('sysparm_sys_id'))) {
-            gr.eventQueue('x_banun_property_0.request.password', gr, gr.getValue('x_banun_bunow_al_0_opened_for'));
-        }
+        if (!gr.get(sysId))
+            return 'error';
+
+        gs.eventQueue('x_banun_property_0.request.password', gr,
+            gr.getValue('x_banun_bunow_al_0_opened_for'), '');
+
         return 'ok';
     },
 
@@ -229,6 +239,10 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
             return;
         }
 
+        // Only 'add' should upsert
+        if (wo.getValue('request_type') != 'add')
+            return;
+
         // ADD: override existing or create new
         var target = new GlideRecord(TARGET);
         var exists = gr.next();
@@ -253,7 +267,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         for (var i = 0; i < fields.length; i++)
             target.setValue(fields[i], wo.getValue(fields[i]));
 
-        // Encrypted fields — decrypt via existing MAP-scoped path
+        // Encrypted fields - decrypt via existing MAP-scoped path
         var creds = this.getAlarmCredentials(workOrderSysId);
         target.setValue('alarm_code', creds.code);
         target.setValue('alarm_password', creds.password);
@@ -298,11 +312,13 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
 
             gr.setValue('alarm_code', code);
             gr.setValue('alarm_password', password);
+            gr.setWorkflow(false);
             gr.update();
         }
     },
+
     /**
-     * Finds credentials on any other open work order for the user —
+     * Finds credentials on any other open work order for the user -
      * covers the gap where the password exists on a work order but
      * hasn't synced to the alarm codes table yet.
      */
@@ -347,7 +363,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return gr.hasNext();
     },
 
-    //Returns the alarm code from any active work order for the user, or '' if none.
+    // Returns the alarm code from any active work order for the user, or '' if none.
     getCodeFromOpenWorkOrders: function(openedFor) {
         if (!openedFor)
             return '';
@@ -361,7 +377,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return gr.next() ? gr.getDisplayValue('alarm_code') : '';
     },
 
-    //Collects decrypted alarm codes from all active work orders.
+    // Collects decrypted alarm codes from all active work orders.
     _getActiveWorkOrderCodes: function() {
         var codes = {};
         var gr = new GlideRecord('x_banun_property_0_physical_security_work_order');
@@ -373,7 +389,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return codes;
     },
 
-    //Validates and writes the alarm password for a work order, then fires the notification event.
+    // Validates and writes the alarm password for a work order, then fires the notification event.
     submitPassword: function(sysId, password) {
         var result = {
             success: false,
@@ -387,7 +403,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         }
 
         if (!password.match(/^[A-Za-z]{4,10}$/)) {
-            result.error = 'Invalid password. Must be 4–10 letters with no numbers or special characters.';
+            result.error = 'Invalid password. Must be 4-10 letters with no numbers or special characters.';
             return result;
         }
 
@@ -397,7 +413,7 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
             return result;
         }
 
-        var latestPw = fresh.getValue('alarm_password');
+        var latestPw = fresh.getDisplayValue('alarm_password');
         if (latestPw && latestPw.trim() !== '') {
             result.state = 'submitted';
             result.error = 'A password has already been submitted for this record.';
@@ -407,10 +423,11 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         fresh.setValue('alarm_password', password);
         fresh.update();
 
-        gs.eventQueue('x_banun_bunow_al_0.alarm.password.submit', fresh, '');
+        gs.eventQueue('x_banun_bunow_al_0.alarm.password.submit', fresh,
+            fresh.getValue('x_banun_bunow_al_0_opened_for'), '');
 
         var verify = new GlideRecord('x_banun_property_0_physical_security_work_order');
-        if (!verify.get(sysId) || !verify.getValue('alarm_password')) {
+        if (!verify.get(sysId) || !verify.getDisplayValue('alarm_password')) {
             result.state = 'error';
             result.error = 'Password was not saved. Please try again.';
             return result;
@@ -420,17 +437,31 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         return result;
     },
 
-    // Writes alarm code/password for a work order inside the MAP-authorized scope
-    applyCredentials: function(workOrderSysId) {
-        var gr = new GlideRecord('x_banun_property_0_physical_security_work_order');
-        if (!gr.get(workOrderSysId))
-            return;
+    /**
+     * Writes alarm code/password for a work order inside the MAP-authorized scope.
+     * Accepts either a GlideRecord (before-insert/update - no update() call)
+     * or a sys_id string (loads and updates the record).
+     */
+    applyCredentials: function(grOrSysId) {
+        var gr = grOrSysId;
+        var loaded = false;
+
+        if (typeof grOrSysId === 'string') {
+            gr = new GlideRecord('x_banun_property_0_physical_security_work_order');
+            if (!gr.get(grOrSysId))
+                return false;
+            loaded = true;
+        }
+
+        if (!gr)
+            return false;
+
         if (gr.getValue('request_type') != 'add')
-            return;
+            return false;
 
         var openedFor = gr.getValue('x_banun_bunow_al_0_opened_for');
         if (!openedFor)
-            return;
+            return false;
 
         var code = '';
         var password = '';
@@ -451,14 +482,18 @@ AlarmCodeHelper.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         }
 
         if (!code && !password)
-            return;
+            return false;
 
         if (code)
             gr.setValue('alarm_code', code);
         if (password)
             gr.setValue('alarm_password', password);
-        gr.update();
+
+        if (loaded)
+            gr.update();
+
+        return true;
     },
 
     type: 'AlarmCodeHelper'
-});
+};
