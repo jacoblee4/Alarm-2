@@ -7,36 +7,31 @@ alarm_codeISNOTEMPTY^ORalarm_passwordISNOTEMPTY^issue_type=alarm_panel^EQ
 condition: current.alarm_code.changes() || current.alarm_password.changes()
 
 
-(function executeRule(current, previous /* null when async */) {
+(function executeRule(current, previous /* null when async */ ) {
 
-    // Validate alarm_code ONLY if it has a value
-    if (!gs.nil(current.alarm_code)) {
+    // Only validate a field that changed in THIS transaction. A changed value is
+    // still in memory as plaintext, so no decrypt is needed. Reading an unchanged
+    // encrypted field forces a decrypt the user may not be authorized for, which
+    // returns the masked value and fails the regex.
+
+    if (current.alarm_code.changes() && !gs.nil(current.alarm_code)) {
         var alarmCode = current.alarm_code.toString();
 
         // Must be exactly 4 digits
         if (!/^\d{4}$/.test(alarmCode)) {
             current.setAbortAction(true);
-            gs.showFieldMsg(
-                'alarm_code',
-                'Alarm code must be exactly 4 digits.',
-                'error'
-            );
+            gs.addErrorMessage('Alarm code must be exactly 4 digits.');
             return;
         }
     }
 
-    // Validate alarm_password ONLY if it has a value
-    if (!gs.nil(current.alarm_password)) {
+    if (current.alarm_password.changes() && !gs.nil(current.alarm_password)) {
         var alarmPassword = current.alarm_password.toString();
 
-        // Must be 4–10 letters, no special characters
+        // Must be 4-10 letters, no special characters
         if (!/^[A-Za-z]{4,10}$/.test(alarmPassword)) {
             current.setAbortAction(true);
-            gs.showFieldMsg(
-                'alarm_password',
-                'Alarm Password must be 4-10 letters, no special characters.',
-                'error'
-            );
+            gs.addErrorMessage('Alarm Password must be 4-10 letters, no special characters.');
             return;
         }
     }
