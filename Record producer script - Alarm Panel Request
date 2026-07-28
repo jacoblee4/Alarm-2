@@ -1,0 +1,49 @@
+(function runProducer(current, producer) {
+
+    // Set issue type and description for the current record
+    current.issue_type = 'alarm_panel';
+    current.short_description = 'PSSR: Alarm Panel Request';
+    current.description = 'Alarm Panel Request for: ' + producer.opened_for.getDisplayValue();
+
+    // Handle 'add' request type
+    if (producer.request_type && producer.request_type.toString() === 'add') {
+
+        // Set user type only — encrypted fields are written by the
+        // after-insert BR via AlarmCodeHelper.applyCredentials()
+        if (producer.opened_for) {
+            var helper = new AlarmCodeHelper();
+            current.user_type = helper.getCredentialsByEmployee(producer.opened_for).found ? 'existing' : 'new';
+        }
+
+        return;
+    }
+
+
+    // Only proceed if request type is 'remove'
+    if (!producer.request_type || producer.request_type.toString() !== 'remove') {
+        return;
+    }
+
+    // Ensure alarm code location is provided
+    if (!producer.alarm_code_location) {
+        return;
+    }
+
+    // Retrieve alarm code record
+    var alarmCodeGR = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    if (!alarmCodeGR.get(producer.alarm_code_location)) {
+        return;
+    }
+
+    // Set branch, region, and building fields based on 'issue_at_branch'
+    if (producer.issue_at_branch == 'Yes') {
+        current.branch = alarmCodeGR.branch;
+        current.region = '';
+        current.building = '';
+    } else {
+        current.branch = '';
+        current.region = alarmCodeGR.region;
+        current.building = alarmCodeGR.building;
+    }
+
+})(current, producer);
