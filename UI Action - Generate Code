@@ -1,5 +1,5 @@
 function onClick(g_form) {
-    var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeHelper');
+    var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeAjax');
     ga.addParam('sysparm_name', 'generateUniqueCode');
 
     ga.getXMLAnswer(function(response) {
