@@ -1,3 +1,5 @@
+Client Callable checked
+
 var AlarmCodeHelper = Class.create();
 AlarmCodeHelper.prototype = {
 
