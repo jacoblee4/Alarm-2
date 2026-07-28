@@ -247,7 +247,7 @@
 	var FIELD_ATTEST = 'attested';
 
 	// Instantiate the AlarmCodeHelper script include
-	var credHelper = new AlarmCodeHelper();
+	var credHelper = new x_banun_bunow_al_0.AlarmCodeHelper();
 
 	// Initialize data object properties
 	data.state = '';
