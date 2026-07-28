@@ -1,0 +1,8 @@
+(function executeRule(current, previous /*null when async*/ ) {
+    var helper = new x_banun_bunow_al_0.AlarmCodeHelper();
+    var openedFor = current.getValue('x_banun_bunow_al_0_opened_for');
+
+    if (helper.hasOpenPasswordRequest(openedFor)) {
+        current.setValue('requested_password', true);
+    }
+})(current, previous);
