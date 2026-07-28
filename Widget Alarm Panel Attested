@@ -322,6 +322,14 @@
 			return;
 		}
 
+		// Read credentials BEFORE attesting - never lock the user out of
+		// credentials we could not actually decrypt
+		var creds = credHelper.getAlarmCredentials(sysId);
+		if (!creds.code || !creds.password) {
+			data.state = 'error';
+			return;
+		}
+
 		// Set attested flag to true
 		fresh.setValue(FIELD_ATTEST, true);
 		fresh.update();
@@ -333,8 +341,6 @@
 			return;
 		}
 
-		// Retrieve and return credentials
-		var creds = credHelper.getAlarmCredentials(sysId);
 		data.code = creds.code;
 		data.password = creds.password;
 		data.location = getLocation(check);
