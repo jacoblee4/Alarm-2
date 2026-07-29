@@ -1,5 +1,3 @@
-client callable checked 
-
 var AlarmCodeAjax = Class.create();
 AlarmCodeAjax.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
 
@@ -21,11 +19,6 @@ AlarmCodeAjax.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
     hasAlarmCode: function() {
         return new x_banun_bunow_al_0.AlarmCodeHelper().hasAlarmCode(
             this.getParameter('sysparm_employee'));
-    },
-
-    firePasswordEmailEvent: function() {
-        return new x_banun_bunow_al_0.AlarmCodeHelper().firePasswordEmailEvent(
-            this.getParameter('sysparm_sys_id'));
     },
 
     type: 'AlarmCodeAjax'
