@@ -12,7 +12,7 @@
         // after-insert BR via AlarmCodeHelper.applyCredentials()
         if (producer.opened_for) {
             var helper = new x_banun_bunow_al_0.AlarmCodeHelper();
-            current.user_type = helper.getCredentialsByEmployee(producer.opened_for).found ? 'existing' : 'new';
+            current.user_type = helper.getCredentialsByEmployee(producer.opened_for.toString()).found ? 'existing' : 'new';
         }
 
         return;
