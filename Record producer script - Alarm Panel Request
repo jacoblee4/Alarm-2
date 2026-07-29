@@ -11,7 +11,7 @@
         // Set user type only — encrypted fields are written by the
         // after-insert BR via AlarmCodeHelper.applyCredentials()
         if (producer.opened_for) {
-            var helper = new AlarmCodeHelper();
+            var helper = new x_banun_bunow_al_0.AlarmCodeHelper();
             current.user_type = helper.getCredentialsByEmployee(producer.opened_for).found ? 'existing' : 'new';
         }
 
@@ -37,13 +37,13 @@
 
     // Set branch, region, and building fields based on 'issue_at_branch'
     if (producer.issue_at_branch == 'Yes') {
-        current.branch = alarmCodeGR.branch;
+        current.branch = alarmCodeGR.getValue('branch');
         current.region = '';
         current.building = '';
     } else {
         current.branch = '';
-        current.region = alarmCodeGR.region;
-        current.building = alarmCodeGR.building;
+        current.region = alarmCodeGR.getValue('region');
+        current.building = alarmCodeGR.getValue('building');
     }
 
 })(current, producer);
