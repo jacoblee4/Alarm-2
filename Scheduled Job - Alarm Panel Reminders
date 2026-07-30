@@ -1,0 +1,69 @@
+(function() {
+
+    // Set days ago to resend the email
+    var THREE_DAYS_AGO = new GlideDateTime();
+    THREE_DAYS_AGO.addDaysUTC(-3);
+
+    // ============================================
+    // Scenario 1 - Password Reminder
+    // ============================================
+    var passGR = new GlideRecord('x_banun_property_0_physical_security_work_order');
+
+    passGR.addActiveQuery();
+    passGR.addQuery('requested_password', true);
+    passGR.addQuery('password_received', false);
+    passGR.addQuery('request_type', 'add');
+    passGR.addQuery('issue_type', 'alarm_panel');
+    passGR.addQuery('password_email_sent', '<=', THREE_DAYS_AGO);
+    passGR.addEncodedQuery('password_email_sentISNOTEMPTY');
+
+    passGR.query();
+
+    while (passGR.next()) {
+
+        //  Trigger event which sends the email
+        gs.eventQueue(
+            'x_banun_bunow_al_0.alarm.panel.pass.remi',
+            passGR,
+            passGR.sys_id.toString()
+        );
+
+        // Update reminder timestamp
+        passGR.setWorkflow(false);
+        passGR.setValue('password_email_sent', new GlideDateTime().getDisplayValue());
+        passGR.update();
+        passGR.setWorkflow(true);
+    }
+
+    // ============================================
+    // Scenario 2 - Attestation Reminder
+    // ============================================
+    var attestGR = new GlideRecord('x_banun_property_0_physical_security_work_order');
+
+    attestGR.addActiveQuery();
+    attestGR.addQuery('attested', false);
+    attestGR.addQuery('password_received', true);
+    attestGR.addQuery('request_type', 'add');
+    attestGR.addQuery('issue_type', 'alarm_panel');
+    attestGR.addQuery('attest_email_sent', '<=', THREE_DAYS_AGO);
+    attestGR.addEncodedQuery('attest_email_sentISNOTEMPTY');
+
+    attestGR.query();
+
+    while (attestGR.next()) {
+
+        // Trigger event
+        gs.eventQueue(
+            'x_banun_bunow_al_0.alarm.panel.attest.re',
+            attestGR,
+            attestGR.sys_id.toString()
+        );
+
+        // Update reminder timestamp
+        attestGR.setWorkflow(false);
+        attestGR.setValue('attest_email_sent', new GlideDateTime().getDisplayValue());
+        attestGR.update();
+        attestGR.setWorkflow(true);
+    }
+
+})();
