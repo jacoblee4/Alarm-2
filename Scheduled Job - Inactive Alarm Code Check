@@ -1,0 +1,91 @@
+(function() {
+
+    var WO_TABLE = 'x_banun_property_0_physical_security_work_order';
+    var CODES_TABLE = 'x_banun_bunow_al_0_alarm_codes';
+
+    // Safety cap - prevents a bad query from flooding the table on first run
+    var MAX_REQUESTS = 100;
+
+    var created = 0;
+    var skipped = 0;
+
+    // ============================================
+    // Find alarm code records belonging to inactive users
+    // ============================================
+    var codeGR = new GlideRecord(CODES_TABLE);
+    codeGR.addQuery('employee.active', false);
+    codeGR.addNotNullQuery('employee');
+    codeGR.query();
+
+    while (codeGR.next()) {
+
+        if (created >= MAX_REQUESTS) {
+            gs.warn('[AlarmRemoval] Hit cap of ' + MAX_REQUESTS + ' - stopping. Re-run to continue.');
+            break;
+        }
+
+        var employee = codeGR.getValue('employee');
+        var isBranch = codeGR.getValue('issue_at_branch') == 'Yes';
+        var branch = codeGR.getValue('branch');
+        var region = codeGR.getValue('region');
+        var building = codeGR.getValue('building');
+
+        // ----- Skip if an open removal request already exists for this location -----
+        var existing = new GlideRecord(WO_TABLE);
+        existing.addActiveQuery();
+        existing.addQuery('issue_type', 'alarm_panel');
+        existing.addQuery('request_type', 'remove');
+        existing.addQuery('x_banun_bunow_al_0_opened_for', employee);
+
+        if (isBranch)
+            existing.addQuery('branch', branch);
+        else
+            existing.addQuery('building', building);
+
+        existing.setLimit(1);
+        existing.query();
+
+        if (existing.hasNext()) {
+            skipped++;
+            continue;
+        }
+
+        // ----- Create the removal request -----
+        var wo = new GlideRecord(WO_TABLE);
+        wo.initialize();
+
+        wo.setValue('issue_type', 'alarm_panel');
+        wo.setValue('request_type', 'remove');
+        wo.setValue('x_banun_bunow_al_0_opened_for', employee);
+        wo.setValue('issue_at_branch', codeGR.getValue('issue_at_branch'));
+
+        if (isBranch) {
+            wo.setValue('branch', branch);
+            wo.setValue('region', '');
+            wo.setValue('building', '');
+        } else {
+            wo.setValue('branch', '');
+            wo.setValue('region', region);
+            wo.setValue('building', building);
+        }
+
+        wo.setValue('short_description', 'PSSR: Alarm Panel Request');
+        wo.setValue('description',
+            'Automated removal request - user is inactive. Alarm panel access removal for: ' +
+            codeGR.employee.getDisplayValue());
+
+        wo.work_notes = 'Created automatically by the Inactive User Alarm Panel Removal scheduled job.';
+
+        var newSysId = wo.insert();
+
+        if (newSysId) {
+            created++;
+        } else {
+            gs.error('[AlarmRemoval] Failed to create removal request for employee ' + employee);
+        }
+    }
+
+    gs.info('[AlarmRemoval] Created {0} removal request(s), skipped {1} that already had an open removal.',
+        created, skipped);
+
+})();
