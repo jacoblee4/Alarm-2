@@ -1,3 +1,5 @@
+Client callable true
+
 var AlarmCodeAjax = Class.create();
 AlarmCodeAjax.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
 
