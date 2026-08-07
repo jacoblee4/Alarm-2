@@ -1,0 +1,32 @@
+onChange - opened_for
+
+function onChange(control, oldValue, newValue, isLoading) {
+    if (isLoading) {
+        g_form.hideFieldMsg('alarm_code_location', true);
+        return;
+    }
+
+    // Reset alarm_code_location if onpened_for changes
+    g_form.setValue('alarm_code_location', '');
+
+
+    if (g_form.getValue('request_type') === 'remove') {
+        var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeHelper');
+        ga.addParam('sysparm_name', 'hasAlarmCode');
+        ga.addParam('sysparm_employee', g_form.getValue('opened_for'));
+
+        ga.getXMLAnswer(function(answer) {
+            g_form.hideFieldMsg('alarm_code_location', true);
+
+            if (answer !== 'true') {
+                g_form.showFieldMsg(
+                    'alarm_code_location',
+                    'No Alarm Code Locations found for this user.',
+                    'error',
+                    true
+                );
+            }
+        });
+    }
+
+}
