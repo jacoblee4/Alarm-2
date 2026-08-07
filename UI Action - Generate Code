@@ -1,6 +1,5 @@
 function onClick(g_form) {
-	g_form.addInfoMessage("START");
-    var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeAjax()');
+    var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeAjax');
     ga.addParam('sysparm_name', 'generateUniqueCode');
 
     ga.getXMLAnswer(function(response) {
@@ -13,9 +12,7 @@ function onClick(g_form) {
             g_form.addErrorMessage('Could not generate a unique code. Please try again or contact an admin.');
             return;
         }
-		g_form.addInfoMessage("RESPONSE: " + response);
         g_form.setValue('alarm_code', response);
-		g_form.addInfoMessage("After Save: " + g_form.getValue('alarm_code'));
 
         if (!g_form.getValue('alarm_code'))
             g_form.addErrorMessage('Code generated (' + response + ') but the field would not accept it - likely encryption rights.');
