@@ -101,7 +101,9 @@ AlarmCodeHelper.prototype = {
             ];
 
             // Remaining digits
-            var remaining = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            var remaining = String(Math.floor(Math.random() * 1000));
+            while (remaining.length < 3)
+                remaining = '0' + remaining;
             var code = String(firstDigit) + remaining;
 
             // ---- Rule: block 911 ----
