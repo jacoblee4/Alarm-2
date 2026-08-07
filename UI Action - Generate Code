@@ -1,20 +1,11 @@
 function onClick(g_form) {
     var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeAjax');
     ga.addParam('sysparm_name', 'generateUniqueCode');
-
     ga.getXMLAnswer(function(response) {
-        if (!response) {
-            g_form.addErrorMessage('No response from AlarmCodeAjax.generateUniqueCode - check the server-side script for an exception.');
-            return;
-        }
-
-        if (response == "ERROR") {
+        if (!response || response == "ERROR") {
             g_form.addErrorMessage('Could not generate a unique code. Please try again or contact an admin.');
             return;
         }
         g_form.setValue('alarm_code', response);
-
-        if (!g_form.getValue('alarm_code'))
-            g_form.addErrorMessage('Code generated (' + response + ') but the field would not accept it - likely encryption rights.');
     });
 }
