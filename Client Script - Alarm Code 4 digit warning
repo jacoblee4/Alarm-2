@@ -1,0 +1,46 @@
+onChange - alarm_code
+
+function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+    // Exit if the form is still loading
+    if (isLoading) {
+        return;
+    }
+
+    // Clear any existing messages first
+    g_form.hideFieldMsg('alarm_code', true);
+
+    // If the new value is empty, exit
+    if (newValue === '') {
+        return;
+    }
+
+    // If the new value is not exactly 4 digits, show an error message
+    if (!/^\d{4}$/.test(newValue)) {
+        g_form.showFieldMsg(
+            'alarm_code',
+            'Alarm code must be exactly 4 digits.',
+            'error'
+        );
+        return;
+    }
+
+    // At this point we know the value is valid (4 digits)
+    // Perform server-side check to see if code is used by another employee
+
+    var openedFor = g_form.getValue('x_banun_bunow_al_0_opened_for');
+
+    var ga = new GlideAjax('x_banun_bunow_al_0.AlarmCodeHelper');
+    ga.addParam('sysparm_name', 'checkCodeInUse');
+    ga.addParam('sysparm_alarm_code', newValue);
+    ga.addParam('sysparm_opened_for', openedFor);
+
+    ga.getXMLAnswer(function(answer) {
+        if (answer === 'IN_USE') {
+            g_form.showFieldMsg(
+                'alarm_code',
+                'This alarm code is already assigned to another employee.',
+                'warning'
+            );
+        }
+    });
+}
