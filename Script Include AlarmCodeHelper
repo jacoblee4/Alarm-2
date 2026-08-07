@@ -57,18 +57,19 @@ AlarmCodeHelper.prototype = {
         }
 
         var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-        gr.addQuery('alarm_code', code);
+        gr.addNotNullQuery('alarm_code');
 
         // Exclude same employee
         if (openedFor) {
             gr.addQuery('employee', '!=', openedFor);
         }
 
-        gr.setLimit(1);
         gr.query();
 
-        if (gr.hasNext())
-            return "IN_USE";
+        while (gr.next()) {
+            if (gr.getDisplayValue('alarm_code') == code)
+                return "IN_USE";
+        }
 
         var wo = new GlideRecord('x_banun_property_0_physical_security_work_order');
         wo.addNotNullQuery('alarm_code');
