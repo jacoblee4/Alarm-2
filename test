@@ -1,15 +1,11 @@
-Not client callabale:
-var test = Class.create();
-test.prototype = {
-    initialize: function() {
-    },
+try {
+    gs.info('A: ' + new x_banun_bunow_al_0.AlarmCodeHelper().generateUniqueCode());
+} catch (e) {
+    gs.error('A EX: ' + e);
+}
 
-    type: 'test'
-};
-
-client callabale:
-var test = Class.create();
-test.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
-
-    type: 'test'
-});
+try {
+    gs.info('B: ' + new AlarmCodeAjax().generateUniqueCode());
+} catch (e) {
+    gs.error('B EX: ' + e);
+}
