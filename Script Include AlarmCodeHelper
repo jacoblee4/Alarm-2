@@ -149,12 +149,15 @@ AlarmCodeHelper.prototype = {
         if (!code)
             return false;
 
-        // Check if the code exists in the alarm codes table
+        // alarm_code is CLEE encrypted - must compare decrypted values
         var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-        gr.addQuery('alarm_code', code);
-        gr.setLimit(1);
+        gr.addNotNullQuery('alarm_code');
         gr.query();
-        return gr.hasNext();
+        while (gr.next()) {
+            if (gr.getDisplayValue('alarm_code') == code)
+                return true;
+        }
+        return false;
     },
 
     // Looks up an employee's existing alarm record and decrypts code/password.
