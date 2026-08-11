@@ -74,7 +74,7 @@
     <div ng-if="c.state === 'revealed'" class="aw-state-content aw-form">
       <div class="aw-header">
         <div class="aw-icon-wrap success-icon"><i class="fa fa-unlock-alt"></i></div>
-        <h2>Your Credentials</h2>
+        <h2>Your Alarm Code & Password</h2>
         <p class="aw-subtitle" ng-if="c.location">for {{c.location}}</p>
       </div>
 
@@ -101,7 +101,7 @@
       </div>
       <div class="aw-final-note">
         <i class="fa fa-info-circle"></i>
-        <p>Save these now. This is the only time they will be shown. Refreshing or returning to this link will not display them again.</p>
+        <p>This is the only time they will be shown. Refreshing or returning to this link will not display them again.</p>
       </div>
     </div>
 
@@ -109,7 +109,7 @@
     <div ng-if="c.state === 'error'" class="aw-state-content">
       <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
       <h2>Something Went Wrong</h2>
-      <p>Your credentials could not be displayed. Please contact an administrator for assistance.</p>
+      <p>Your Alarm Code & Password could not be displayed. Please contact an administrator for assistance.</p>
     </div>
 
   </div>
@@ -365,7 +365,6 @@
 		return '';
 	}
 })();
-
 
 
 
