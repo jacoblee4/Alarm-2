@@ -238,14 +238,22 @@ AlarmCodeHelper.prototype = {
             gr.addQuery('building', wo.getValue('building'));
         gr.query();
 
-        // REMOVE: delete all matches
+        // REMOVE: branch on removal_type
         if (wo.getValue('request_type') == 'remove') {
-            if (gr.hasNext())
-                gr.deleteMultiple();
-            return;
-        }
+            var removalType = wo.getValue('removal_type');
 
-        // Only 'add' should upsert
+            if (removalType == 'remove_individual') {
+                while (gr.next()) {
+                    gr.setValue('phone_number', '');
+                    gr.setValue('emergency_list', false);
+                    gr.update();
+                }
+            } else if (removalType == 'remove_all') {
+                if (gr.hasNext())
+                    gr.deleteMultiple();
+            }
+            return;
+        }ly 'add' should upsert
         if (wo.getValue('request_type') != 'add')
             return;
 
