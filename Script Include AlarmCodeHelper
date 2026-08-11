@@ -1,5 +1,3 @@
-client callable false
-
 var AlarmCodeHelper = Class.create();
 AlarmCodeHelper.prototype = {
 
