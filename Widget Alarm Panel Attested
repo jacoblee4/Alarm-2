@@ -12,7 +12,10 @@
     <div ng-if="c.state === 'no_record'" class="aw-state-content">
       <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
       <h2>No Record Found</h2>
-      <p>No reference record found. Please contact an administrator.</p>
+      <p>No reference record found.</p>
+      <p class="aw-contact">For any issues, please contact Corporate Security at
+        <a href="mailto:MB-PhysicalSecurity@BankUnited.Com">MB-PhysicalSecurity@BankUnited.Com</a>.
+      </p>
     </div>
 
     <!-- ===== DENIED ===== -->
@@ -33,7 +36,10 @@
     <div ng-if="c.state === 'already_attested'" class="aw-state-content">
       <div class="aw-icon-wrap submitted-icon"><i class="fa fa-check-circle"></i></div>
       <h2>Already Confirmed</h2>
-      <p>You've already confirmed receipt of your alarm code and password. For security, they can no longer be viewed from this link. If you've lost them, please contact an administrator.</p>
+      <p>You've already confirmed receipt of your alarm code and password. For security, they can no longer be viewed from this link.</p>
+      <p class="aw-contact">If you've lost them, please contact Corporate Security at
+        <a href="mailto:MB-PhysicalSecurity@BankUnited.Com">MB-PhysicalSecurity@BankUnited.Com</a>.
+      </p>
     </div>
 
     <!-- ===== INTRO / ACKNOWLEDGE ===== -->
@@ -74,7 +80,7 @@
     <div ng-if="c.state === 'revealed'" class="aw-state-content aw-form">
       <div class="aw-header">
         <div class="aw-icon-wrap success-icon"><i class="fa fa-unlock-alt"></i></div>
-        <h2>Your Alarm Code & Password</h2>
+        <h2>Your Alarm Code &amp; Password</h2>
         <p class="aw-subtitle" ng-if="c.location">for {{c.location}}</p>
       </div>
 
@@ -109,7 +115,10 @@
     <div ng-if="c.state === 'error'" class="aw-state-content">
       <div class="aw-icon-wrap denied-icon"><i class="fa fa-times-circle"></i></div>
       <h2>Something Went Wrong</h2>
-      <p>Your Alarm Code & Password could not be displayed. Please contact an administrator for assistance.</p>
+      <p>Your Alarm Code &amp; Password could not be displayed.</p>
+      <p class="aw-contact">For assistance, please contact Corporate Security at
+        <a href="mailto:MB-PhysicalSecurity@BankUnited.Com">MB-PhysicalSecurity@BankUnited.Com</a>.
+      </p>
     </div>
 
   </div>
@@ -156,6 +165,10 @@
 .aw-form { text-align: left; }
 .aw-header { text-align: center; margin-bottom: 24px; }
 .aw-subtitle { font-size: 14px; color: #8c96b0; }
+
+.aw-contact { font-size: 14px; color: #525f7f; margin-top: 10px; line-height: 1.6; }
+.aw-contact a { color: #1890ff; font-weight: 600; text-decoration: none; word-break: break-word; }
+.aw-contact a:hover { text-decoration: underline; }
 
 .aw-warn {
   display: flex; gap: 12px; text-align: left;
