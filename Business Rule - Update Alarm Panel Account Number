@@ -1,1 +1,22 @@
-test
+(function executeRule(current, previous /*null when async*/) {
+
+    var acct = '';
+    var gr;
+
+    if (current.getValue('issue_at_branch') == 'Yes') {
+        if (!current.branch.nil()) {
+            gr = new GlideRecord('cmdb_ci_building_facility');
+            if (gr.get(current.getValue('branch')))
+                acct = gr.getValue('u_alarm_panel_account_number') || '';
+        }
+    } else if (current.getValue('issue_at_branch') == 'No') {
+        if (!current.building.nil()) {
+            gr = new GlideRecord('sn_wsd_core_building');
+            if (gr.get(current.getValue('building')))
+                acct = gr.getValue('u_alarm_panel_account_number') || '';
+        }
+    }
+
+    current.setValue('alarm_panel_account_number', acct);
+
+})(current, previous);
