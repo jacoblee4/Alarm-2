@@ -1,0 +1,207 @@
+//HTML
+
+<div ng-if="data.error" class="alert alert-info" tabindex="0">
+    ${This page is only for vendors to use.}
+</div>
+
+<div ng-if="!data.error" class="panel panel-{{::options.color}} b svdp" role="region" aria-labelledby="task-information-title">
+    <div class="panel-heading buvp">
+        <h2 id="task-information-title" class="panel-title">
+            <fa ng-if="::options.glyph.length" name="{{::options.glyph}}" class="m-r-sm"></fa>
+            {{data.title}}
+        </h2>
+    </div>
+
+    <div class="panel-body" style="padding-bottom: 0;">
+        <div class="details">
+            <div ng-if="!data.isAlarmPanel" class="col-lgsm-12 field" style="padding-bottom: 5;">
+                <label class="m-n">{{data.dateName}}</label>
+                <sp-date-picker field="c.data.dateValue" ng-model="c.data.dateValue" sn-change="" sn-include-time="true"></sp-date-picker>
+
+                <button class="btn btn-primary" ng-click="updateDate()">
+                    ${Save}
+                </button>
+                <script>
+                    $(document).on("mouseenter", "button[aria-label='Show Calendar for {0}']", function () {
+                        $("button[aria-label='Show Calendar for {0}']").attr("title", "Pick Date").tooltip("fixTitle").tooltip("show");
+                    });
+                </script>
+            </div>
+            <div ng-if="field.type != 'glide_date_time'" class="col-sm-6 field" ng-repeat="field in data.fields">
+                <span class="field-value">
+                    <label class="m-n">{{field.label}}</label>
+                    <div>{{field.display_value}}</div>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+//CSS
+
+label {
+  font-weight: bold; 
+}
+
+div.details {
+  color: $dark-text-color;
+}
+
+.panel-heading {
+  padding: 15px 20px 10px;
+}
+
+div.details label{
+  color: #555;
+  font-weight: 600;
+}
+
+div.field {
+  padding: 0 !important;
+  padding-right: 1px!important;
+  margin-bottom: 5px;
+}
+
+span.field-value {
+  min-height: 44px;
+  display: block;
+}
+
+.btn-primary{
+  margin-top: 5px;
+}
+
+
+
+
+
+
+
+
+// Server Script
+
+(function() {
+    data.error = false;
+    gr = new GlideRecordSecure("vm_vdr_contact");
+    if (!gr.get(gs.getUserID()) || !gs.getUser().hasRole('vendor_contact')) {
+        data.error = true;
+        return;
+    }
+    var table = $sp.getParameter("table");
+    var sys_id = $sp.getParameter("sys_id");
+
+    data.title = "${Record Information}";
+
+    var gr = new GlideRecordSecure(table);
+    gr.get(sys_id);
+
+    var api = new x_banun_property_0.BUVPVendorPortalUtils();
+    if (!api.vendorContactHasAccess(gr))
+        return;
+
+    // Hide schedule date + requester when parent issue_type is alarm_panel
+    data.isAlarmPanel = (gr.parent.issue_type == 'alarm_panel');
+
+    var fields;
+    data.title = "${Task Details}";
+    fields = 'state,service_date,requester,vendor,impacted_cost_center,branch,u_address,region,site,campus,building,floor';
+
+    fields = fields.split(',');
+
+    var fieldsInfo = [];
+    for (var i = 0; i < fields.length; i++) {
+        var field = {};
+        field.name = fields[i];
+
+        // Skip requester when alarm panel
+        if (field.name == 'requester' && data.isAlarmPanel)
+            continue;
+
+        if (field.name != 'u_address') {
+            field.label = gr[fields[i]].getLabel();
+            field.value = gr[fields[i]] + '';
+            field.display_value = gr[fields[i]].getDisplayValue();
+        }
+
+        if (field.name == 'service_date') {
+            field.type = 'glide_date_time';
+            data.dateName = field.label;
+            data.dateValue = field.display_value;
+        }
+
+        if (field.name == 'requester') {
+            field.display_value = api.getRequesterName(sys_id);
+        }
+
+        if (field.name == 'u_address') {
+            field.label = "Address";
+            try {
+                field.value = api.getBranchAddress(sys_id);
+            } catch (e) {
+                field.value = '';
+            }
+            field.display_value = field.value;
+        }
+
+        if (field.value) {
+            fieldsInfo.push(field);
+        }
+    }
+
+    data.fields = fieldsInfo;
+
+    if (input) {
+        if (input.action == "updateDate") {
+
+            //Need to incrase date by 5 hours
+            var date = new GlideDateTime(input.dateValue);
+            var hours = 60 * 60 * 5;
+            date.addSeconds(hours);
+
+            var vTask = new GlideRecord(table);
+            vTask.get(sys_id);
+            vTask.setValue('service_date', date.getValue());
+            vTask.update();
+        }
+    }
+
+})();
+
+
+
+
+
+
+
+
+
+// Client Script
+
+api.controller=function($scope, spUtil) {
+    $scope.$on('record.updated', function(name, data) {
+        spUtil.update($scope);
+    });
+
+    var c = this;
+    $scope.updateDate = function() {
+        c.data.action = "updateDate";
+        if (getDateFromFormat(c.data.dateValue, 'MM-dd-yyyy HH:mm:ss') != 0) {
+            c.server.update().then(function() {
+                spUtil.addInfoMessage("${Scheduled Service Date has been Saved.}");
+                c.data.action = undefined;
+            })
+        } else {
+            spUtil.addErrorMessage("${Scheduled Service Date was not saved. Please use correct formatting for date/time: MM-DD-YYYY HH:MM:SS.}");
+            alert("Scheduled Service Date was not saved. Please use correct formatting for date/time: MM-DD-YYYY HH:MM:SS.");
+        }
+
+
+    }
+}
