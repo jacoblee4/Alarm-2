@@ -44,6 +44,7 @@
 
 
 
+
 //CSS
 
 label {
@@ -111,7 +112,7 @@ span.field-value {
 
     var fields;
     data.title = "${Task Details}";
-    fields = 'state,service_date,requester,vendor,impacted_cost_center,branch,u_address,region,site,campus,building,floor';
+    fields = 'state,service_date,requester,vendor,impacted_cost_center,branch,u_address,region,site,campus,building,floor,alarm_panel_account_number';
 
     fields = fields.split(',');
 
@@ -124,10 +125,16 @@ span.field-value {
         if (field.name == 'requester' && data.isAlarmPanel)
             continue;
 
-        if (field.name != 'u_address') {
+        if (field.name != 'u_address' && field.name != 'alarm_panel_account_number') {
             field.label = gr[fields[i]].getLabel();
             field.value = gr[fields[i]] + '';
             field.display_value = gr[fields[i]].getDisplayValue();
+        }
+
+		if (field.name == 'alarm_panel_account_number') {
+            field.label = 'Alarm Panel Account Number';
+            field.value = gr.parent.alarm_panel_account_number + '';
+            field.display_value = field.value;
         }
 
         if (field.name == 'service_date') {
@@ -173,6 +180,7 @@ span.field-value {
     }
 
 })();
+
 
 
 
