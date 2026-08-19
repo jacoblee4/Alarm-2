@@ -1,7 +1,32 @@
-var gr = new GlideRecord('sys_import_log');
-gr.orderByDesc('sys_created_on');
-gr.setLimit(20);
+var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes_import');
+gr.addQuery('sys_import_state', 'error');
+gr.setLimit(5);
 gr.query();
+
 while (gr.next()) {
-    gs.info('LOG >> [' + gr.getValue('level') + '] ' + gr.getValue('message'));
+    gs.info('=== ROW ' + gr.getUniqueValue() + ' ===');
+    gs.info('  state    = [' + gr.getValue('sys_import_state') + ']');
+    gs.info('  comment  = [' + gr.getValue('sys_import_state_comment') + ']');
+    gs.info('  row_err  = [' + gr.getValue('sys_import_row_error') + ']');
+    gs.info('  target   = [' + gr.getValue('sys_target_sys_id') + ']');
+    gs.info('  set      = [' + gr.getValue('sys_import_set') + ']');
+
+    var t = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    if (t.get(gr.getValue('sys_target_sys_id'))) {
+        gs.info('  TARGET EXISTS');
+        gs.info('    employee = [' + t.getValue('employee') + ']');
+        gs.info('    code     = [' + t.getDisplayValue('alarm_code') + ']');
+        gs.info('    pw       = [' + t.getDisplayValue('alarm_password') + ']');
+    } else {
+        gs.info('  TARGET MISSING - sys_id points at nothing');
+    }
+}
+
+var er = new GlideRecord('sys_import_set_row_error');
+er.orderByDesc('sys_created_on');
+er.setLimit(10);
+er.query();
+gs.info('=== ROW ERRORS: ' + er.getRowCount() + ' ===');
+while (er.next()) {
+    gs.info('  ERR >> ' + er.getValue('error_message'));
 }
