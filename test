@@ -1,32 +1,47 @@
-var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes_import');
-gr.addQuery('sys_import_state', 'error');
-gr.setLimit(5);
-gr.query();
-
-while (gr.next()) {
-    gs.info('=== ROW ' + gr.getUniqueValue() + ' ===');
-    gs.info('  state    = [' + gr.getValue('sys_import_state') + ']');
-    gs.info('  comment  = [' + gr.getValue('sys_import_state_comment') + ']');
-    gs.info('  row_err  = [' + gr.getValue('sys_import_row_error') + ']');
-    gs.info('  target   = [' + gr.getValue('sys_target_sys_id') + ']');
-    gs.info('  set      = [' + gr.getValue('sys_import_set') + ']');
-
-    var t = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    if (t.get(gr.getValue('sys_target_sys_id'))) {
-        gs.info('  TARGET EXISTS');
-        gs.info('    employee = [' + t.getValue('employee') + ']');
-        gs.info('    code     = [' + t.getDisplayValue('alarm_code') + ']');
-        gs.info('    pw       = [' + t.getDisplayValue('alarm_password') + ']');
-    } else {
-        gs.info('  TARGET MISSING - sys_id points at nothing');
-    }
-}
-
-var er = new GlideRecord('sys_import_set_row_error');
-er.orderByDesc('sys_created_on');
-er.setLimit(10);
-er.query();
-gs.info('=== ROW ERRORS: ' + er.getRowCount() + ' ===');
-while (er.next()) {
-    gs.info('  ERR >> ' + er.getValue('error_message'));
-}
+x_banun_bunow_al_0: === ROW 19eedf15a43e83506d754bdd055189cc ===
+x_banun_bunow_al_0:   state    = [error]
+x_banun_bunow_al_0:   comment  = [null]
+x_banun_bunow_al_0:   row_err  = [null]
+x_banun_bunow_al_0:   target   = [e3c223d1a47e83506d754bdd05518972]
+x_banun_bunow_al_0:   set      = [d1eedf15a43e83506d754bdd055189cb]
+x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
+x_banun_bunow_al_0: === ROW 11eedf15a43e83506d754bdd055189cd ===
+x_banun_bunow_al_0:   state    = [error]
+x_banun_bunow_al_0:   comment  = [null]
+x_banun_bunow_al_0:   row_err  = [null]
+x_banun_bunow_al_0:   target   = [6fc223d1a47e83506d754bdd05518975]
+x_banun_bunow_al_0:   set      = [d1eedf15a43e83506d754bdd055189cb]
+x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
+x_banun_bunow_al_0: === ROW ba43ab15a47e83506d754bdd055189b9 ===
+x_banun_bunow_al_0:   state    = [error]
+x_banun_bunow_al_0:   comment  = [null]
+x_banun_bunow_al_0:   row_err  = [null]
+x_banun_bunow_al_0:   target   = [5c53eb15a47e83506d754bdd0551899c]
+x_banun_bunow_al_0:   set      = [fa43ab15a47e83506d754bdd055189b8]
+x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
+x_banun_bunow_al_0: === ROW 3243ab15a47e83506d754bdd055189ba ===
+x_banun_bunow_al_0:   state    = [error]
+x_banun_bunow_al_0:   comment  = [null]
+x_banun_bunow_al_0:   row_err  = [null]
+x_banun_bunow_al_0:   target   = [6c53eb15a47e83506d754bdd0551899e]
+x_banun_bunow_al_0:   set      = [fa43ab15a47e83506d754bdd055189b8]
+x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
+x_banun_bunow_al_0: === ROW 9efb147da4320b506d754bdd05518921 ===
+x_banun_bunow_al_0:   state    = [error]
+x_banun_bunow_al_0:   comment  = [null]
+x_banun_bunow_al_0:   row_err  = [null]
+x_banun_bunow_al_0:   target   = [6bfb147da4320b506d754bdd055189e8]
+x_banun_bunow_al_0:   set      = [1afb147da4320b506d754bdd05518920]
+x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
+Security restricted: Read operation on table 'sys_import_set_row_error' from scope 'BUNow Alarm Panel' was granted and added to 'BUNow Alarm Panel' cross scope privileges
+x_banun_bunow_al_0: === ROW ERRORS: 10 ===
+x_banun_bunow_al_0:   ERR >> Unable to resolve target record, coalesce values not present: email
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Error occured during row insert
+x_banun_bunow_al_0:   ERR >> Unable to resolve target record, coalesce values not present: email
