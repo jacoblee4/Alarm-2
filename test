@@ -1,9 +1,25 @@
-(function transformRow(source, target, map, log, isUpdate) {
+(function runTransformScript(source, map, log, target) {
+    gs.info('XF1 >> script entered');
+
     var code = source.getValue('u_alarm_code');
     var pw = source.getValue('u_alarm_password');
+    gs.info('XF2 >> code=[' + code + '] pw=[' + pw + ']');
 
-    if (code)
-        target.setValue('alarm_code', code);
-    if (pw)
-        target.setValue('alarm_password', pw);
-})(source, target, map, log, action === "update");
+    gs.info('XF3 >> target table=' + target.getTableName() +
+            ' isNewRecord=' + target.isNewRecord());
+
+    try {
+        if (code) {
+            target.setValue('alarm_code', code);
+            gs.info('XF4 >> set code, now reads=[' + target.getValue('alarm_code') + ']');
+        }
+        if (pw) {
+            target.setValue('alarm_password', pw);
+            gs.info('XF5 >> set pw, now reads=[' + target.getValue('alarm_password') + ']');
+        }
+    } catch (e) {
+        gs.error('XF-ERR >> ' + e);
+    }
+
+    gs.info('XF6 >> script complete');
+})(source, map, log, target);
