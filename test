@@ -1,25 +1,56 @@
-(function runTransformScript(source, map, log, target) {
-    gs.info('XF1 >> script entered');
+Created
+Level
+Source
+Message
+Class
+Context map
+Created by
+Sequence
+Source application family
+Source package
+Search
+Search
+Search
+XF
+Search
+Search
+Search
+Search
+Search
+Search
 
-    var code = source.getValue('u_alarm_code');
-    var pw = source.getValue('u_alarm_password');
-    gs.info('XF2 >> code=[' + code + '] pw=[' + pw + ']');
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF6 >> script complete	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b26b0000001	(empty)	(empty)
 
-    gs.info('XF3 >> target table=' + target.getTableName() +
-            ' isNewRecord=' + target.isNewRecord());
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF5 >> set pw, now reads=[testing]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b2690000001	(empty)	(empty)
 
-    try {
-        if (code) {
-            target.setValue('alarm_code', code);
-            gs.info('XF4 >> set code, now reads=[' + target.getValue('alarm_code') + ']');
-        }
-        if (pw) {
-            target.setValue('alarm_password', pw);
-            gs.info('XF5 >> set pw, now reads=[' + target.getValue('alarm_password') + ']');
-        }
-    } catch (e) {
-        gs.error('XF-ERR >> ' + e);
-    }
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF4 >> set code, now reads=[4321]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b2670000001	(empty)	(empty)
 
-    gs.info('XF6 >> script complete');
-})(source, map, log, target);
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF3 >> target table=x_banun_bunow_al_0_alarm_codes isNewRecord=false	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b2650000001	(empty)	(empty)
+
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF2 >> code=[4321] pw=[testing]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b2640000001	(empty)	(empty)
+
+08-19-2026 15:56:27
+Information	x_banun_bunow_al_0	XF1 >> script entered	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b2620000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF1 >> script entered	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0a90000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF2 >> code=[1234] pw=[tester]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0ab0000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF3 >> target table=x_banun_bunow_al_0_alarm_codes isNewRecord=false	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0ad0000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF4 >> set code, now reads=[1234]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0ae0000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF5 >> set pw, now reads=[tester]	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0b00000001	(empty)	(empty)
+
+08-19-2026 15:56:26
+Information	x_banun_bunow_al_0	XF6 >> script complete	App Log Entry	{"_system_id":"app130064.aus601.service-...	JPeterson	1a01b98b0b10000001	(empty)	(empty)
