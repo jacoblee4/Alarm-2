@@ -1,47 +1,21 @@
-x_banun_bunow_al_0: === ROW 19eedf15a43e83506d754bdd055189cc ===
-x_banun_bunow_al_0:   state    = [error]
-x_banun_bunow_al_0:   comment  = [null]
-x_banun_bunow_al_0:   row_err  = [null]
-x_banun_bunow_al_0:   target   = [e3c223d1a47e83506d754bdd05518972]
-x_banun_bunow_al_0:   set      = [d1eedf15a43e83506d754bdd055189cb]
-x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
-x_banun_bunow_al_0: === ROW 11eedf15a43e83506d754bdd055189cd ===
-x_banun_bunow_al_0:   state    = [error]
-x_banun_bunow_al_0:   comment  = [null]
-x_banun_bunow_al_0:   row_err  = [null]
-x_banun_bunow_al_0:   target   = [6fc223d1a47e83506d754bdd05518975]
-x_banun_bunow_al_0:   set      = [d1eedf15a43e83506d754bdd055189cb]
-x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
-x_banun_bunow_al_0: === ROW ba43ab15a47e83506d754bdd055189b9 ===
-x_banun_bunow_al_0:   state    = [error]
-x_banun_bunow_al_0:   comment  = [null]
-x_banun_bunow_al_0:   row_err  = [null]
-x_banun_bunow_al_0:   target   = [5c53eb15a47e83506d754bdd0551899c]
-x_banun_bunow_al_0:   set      = [fa43ab15a47e83506d754bdd055189b8]
-x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
-x_banun_bunow_al_0: === ROW 3243ab15a47e83506d754bdd055189ba ===
-x_banun_bunow_al_0:   state    = [error]
-x_banun_bunow_al_0:   comment  = [null]
-x_banun_bunow_al_0:   row_err  = [null]
-x_banun_bunow_al_0:   target   = [6c53eb15a47e83506d754bdd0551899e]
-x_banun_bunow_al_0:   set      = [fa43ab15a47e83506d754bdd055189b8]
-x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
-x_banun_bunow_al_0: === ROW 9efb147da4320b506d754bdd05518921 ===
-x_banun_bunow_al_0:   state    = [error]
-x_banun_bunow_al_0:   comment  = [null]
-x_banun_bunow_al_0:   row_err  = [null]
-x_banun_bunow_al_0:   target   = [6bfb147da4320b506d754bdd055189e8]
-x_banun_bunow_al_0:   set      = [1afb147da4320b506d754bdd05518920]
-x_banun_bunow_al_0:   TARGET MISSING - sys_id points at nothing
-Security restricted: Read operation on table 'sys_import_set_row_error' from scope 'BUNow Alarm Panel' was granted and added to 'BUNow Alarm Panel' cross scope privileges
-x_banun_bunow_al_0: === ROW ERRORS: 10 ===
-x_banun_bunow_al_0:   ERR >> Unable to resolve target record, coalesce values not present: email
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Error occured during row insert
-x_banun_bunow_al_0:   ERR >> Unable to resolve target record, coalesce values not present: email
+// 1. Row errors for YOUR import sets only
+var er = new GlideRecord('sys_import_set_row_error');
+er.addQuery('sys_import_set', 'IN',
+    'd1eedf15a43e83506d754bdd055189cb,fa43ab15a47e83506d754bdd055189b8,1afb147da4320b506d754bdd05518920');
+er.query();
+gs.info('=== YOUR ERRORS: ' + er.getRowCount() + ' ===');
+while (er.next()) {
+    gs.info('  ERR >> ' + er.getValue('error_message'));
+}
+
+// 2. Every transform map pointing at this import table
+var tm = new GlideRecord('sys_transform_map');
+tm.addQuery('source_table', 'x_banun_bunow_al_0_alarm_codes_import');
+tm.query();
+gs.info('=== MAPS: ' + tm.getRowCount() + ' ===');
+while (tm.next()) {
+    gs.info('  MAP >> ' + tm.getValue('name') +
+            ' active=' + tm.getValue('active') +
+            ' target=' + tm.getValue('target_table') +
+            ' runBR=' + tm.getValue('run_business_rules'));
+}
