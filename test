@@ -1,26 +1,9 @@
-(function runTransformScript(source, map, log, target) {
+(function transformRow(source, target, map, log, isUpdate) {
     var code = source.getValue('u_alarm_code');
     var pw = source.getValue('u_alarm_password');
-    gs.info('XF >> src code=[' + code + '] pw=[' + pw + ']');
-
-    var sysId = target.getUniqueValue();
-    gs.info('XF >> target=' + sysId);
-
-    var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    if (!gr.get(sysId)) {
-        gs.info('XF >> target not found');
-        return;
-    }
 
     if (code)
-        gr.setValue('alarm_code', code);
+        target.setValue('alarm_code', code);
     if (pw)
-        gr.setValue('alarm_password', pw);
-    gr.setWorkflow(false);
-    gr.update();
-
-    var check = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    check.get(sysId);
-    gs.info('XF >> readback code=[' + check.getDisplayValue('alarm_code') +
-            '] pw=[' + check.getDisplayValue('alarm_password') + ']');
-})(source, map, log, target);
+        target.setValue('alarm_password', pw);
+})(source, target, map, log, action === "update");
