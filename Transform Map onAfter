@@ -1,0 +1,18 @@
+(function runTransformScript(source, map, log, target) {
+    var code = source.u_alarm_code ? source.u_alarm_code.toString().trim() : '';
+    var pw = source.u_alarm_password ? source.u_alarm_password.toString().trim() : '';
+    if (!code && !pw)
+        return;
+
+    var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    if (!gr.get(target.getUniqueValue()))
+        return;
+
+    if (code)
+        gr.setValue('alarm_code', code);
+    if (pw)
+        gr.setValue('alarm_password', pw);
+
+    gr.setWorkflow(false);
+    gr.update();
+})(source, map, log, target);
