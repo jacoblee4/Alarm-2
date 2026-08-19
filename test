@@ -1,12 +1,11 @@
-var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-gr.setLimit(1);
+var gr = new GlideRecord('u_imp_alarm_codes');
+gr.setLimit(3);
 gr.query();
-if (gr.next()) {
-    gs.info('USER >> ' + gs.getUserName());
-    gr.setValue('alarm_password', 'Testpass');
-    gr.update();
-
-    var check = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    check.get(gr.getUniqueValue());
-    gs.info('READBACK >> [' + check.getDisplayValue('alarm_password') + ']');
+while (gr.next()) {
+    var fields = gr.getFields();
+    for (var i = 0; i < fields.size(); i++) {
+        var f = fields.get(i);
+        gs.info('COL >> ' + f.getName() + ' = [' + f.getDisplayValue() + ']');
+    }
+    gs.info('--- end row ---');
 }
