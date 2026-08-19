@@ -1,11 +1,12 @@
-try {
-    gs.info('A: ' + new x_banun_bunow_al_0.AlarmCodeHelper().generateUniqueCode());
-} catch (e) {
-    gs.error('A EX: ' + e);
-}
+var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+gr.setLimit(1);
+gr.query();
+if (gr.next()) {
+    gs.info('USER >> ' + gs.getUserName());
+    gr.setValue('alarm_password', 'Testpass');
+    gr.update();
 
-try {
-    gs.info('B: ' + new AlarmCodeAjax().generateUniqueCode());
-} catch (e) {
-    gs.error('B EX: ' + e);
+    var check = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    check.get(gr.getUniqueValue());
+    gs.info('READBACK >> [' + check.getDisplayValue('alarm_password') + ']');
 }
