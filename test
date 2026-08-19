@@ -1,21 +1,18 @@
-// 1. Row errors for YOUR import sets only
-var er = new GlideRecord('sys_import_set_row_error');
-er.addQuery('sys_import_set', 'IN',
-    'd1eedf15a43e83506d754bdd055189cb,fa43ab15a47e83506d754bdd055189b8,1afb147da4320b506d754bdd05518920');
-er.query();
-gs.info('=== YOUR ERRORS: ' + er.getRowCount() + ' ===');
-while (er.next()) {
-    gs.info('  ERR >> ' + er.getValue('error_message'));
-}
+var imp = new GlideRecord('x_banun_bunow_al_0_alarm_codes_import');
+imp.addQuery('sys_import_state', 'inserted');
+imp.query();
 
-// 2. Every transform map pointing at this import table
-var tm = new GlideRecord('sys_transform_map');
-tm.addQuery('source_table', 'x_banun_bunow_al_0_alarm_codes_import');
-tm.query();
-gs.info('=== MAPS: ' + tm.getRowCount() + ' ===');
-while (tm.next()) {
-    gs.info('  MAP >> ' + tm.getValue('name') +
-            ' active=' + tm.getValue('active') +
-            ' target=' + tm.getValue('target_table') +
-            ' runBR=' + tm.getValue('run_business_rules'));
+var ok = 0, bad = 0;
+while (imp.next()) {
+    var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    if (!gr.get(imp.getValue('sys_target_sys_id'))) { bad++; continue; }
+
+    gr.setValue('alarm_code', imp.getValue('u_alarm_code'));
+    gr.setValue('alarm_password', imp.getValue('u_alarm_password'));
+    gr.update();
+
+    var c = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    c.get(gr.getUniqueValue());
+    c.getDisplayValue('alarm_password') ? ok++ : bad++;
 }
+gs.info('DONE >> ok=' + ok + ' bad=' + bad);
