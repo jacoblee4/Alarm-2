@@ -1,8 +1,5 @@
-var gr = new GlideRecord('u_imp_alarm_codes');
-gr.setLimit(5);
-gr.query();
-while (gr.next()) {
-    gs.info('ROW >> state=[' + gr.getValue('sys_import_state') +
-            '] comment=[' + gr.getValue('sys_import_state_comment') +
-            '] target=[' + gr.getValue('sys_target_sys_id') + ']');
-}
+x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[e3c223d1a47e83506d754bdd05518972]
+x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[6fc223d1a47e83506d754bdd05518975]
+x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[5c53eb15a47e83506d754bdd0551899c]
+x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[6c53eb15a47e83506d754bdd0551899e]
+x_banun_bunow_al_0: ROW >> state=[inserted] comment=[null] target=[247b0361a4be87506d754bdd055189d0]
