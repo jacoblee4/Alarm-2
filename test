@@ -1,42 +1,26 @@
-Script execution error: Script Identifier: null.null.script, Error Description: Function getFields is not allowed in scope x_banun_bunow_al_0, Script ES Level: 200
-Evaluator.evaluateString() problem: com.glide.script.fencing.MethodNotAllowedException: Function getFields is not allowed in scope x_banun_bunow_al_0: 	com.glide.script.fencing.ScopedScriptableObject.checkWhitelistAccess(ScopedScriptableObject.java:138)
-	com.glide.script.fencing.ScopedScriptableObject.shouldAllow(ScopedScriptableObject.java:106)
-	com.glide.script.fencing.WrappedScriptableObject.get(WrappedScriptableObject.java:57)
-	com.glide.script.fencing.ScopedGlideRecord.get(ScopedGlideRecord.java:78)
-	org.mozilla.javascript.ScriptableObject.getProperty(ScriptableObject.java:2383)
-	org.mozilla.javascript.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2797)
-	org.mozilla.javascript.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2784)
-	org.mozilla.javascript.Interpreter.interpretLoop(Interpreter.java:1530)
-	org.mozilla.javascript.Interpreter.interpret(Interpreter.java:907)
-	org.mozilla.javascript.InterpretedFunction.lambda$call$0(InterpretedFunction.java:137)
-	com.glide.caller.gen.null_null_script.call(Unknown Source)
-	com.glide.script.ScriptCaller.call(ScriptCaller.java:22)
-	org.mozilla.javascript.InterpretedFunction.call(InterpretedFunction.java:135)
-	org.mozilla.javascript.ContextFactory.doTopCall(ContextFactory.java:720)
-	org.mozilla.javascript.ScriptRuntime.doTopCall(ScriptRuntime.java:4501)
-	org.mozilla.javascript.InterpretedFunction.exec(InterpretedFunction.java:151)
-	com.glide.script.ScriptCompiler.executeAndPublishMetric(ScriptCompiler.java:78)
-	com.glide.script.ScriptEvaluator.execute(ScriptEvaluator.java:502)
-	com.glide.script.ScriptEvaluator.evaluate(ScriptEvaluator.java:246)
-	com.glide.script.fencing.GlideScopedEvaluator.evaluateScript(GlideScopedEvaluator.java:393)
-	com.glide.script.fencing.GlideScopedEvaluator.evaluateScript(GlideScopedEvaluator.java:275)
-	com.glide.script.fencing.GlideScopedEvaluator.evaluateScript(GlideScopedEvaluator.java:252)
-	com.glide.processors.ScriptProcessor.evaluateScript0(ScriptProcessor.java:406)
-	com.glide.processors.ScriptProcessor.lambda$evaluateScriptWithRecordingOption$0(ScriptProcessor.java:389)
-	com.glide.rollback.recording.RollbackRecorder.execute(RollbackRecorder.java:67)
-	com.glide.processors.ScriptProcessor.evaluateScriptWithRecordingOption(ScriptProcessor.java:389)
-	com.glide.processors.ScriptProcessor.evaluateScript(ScriptProcessor.java:369)
-	com.glide.processors.ScriptProcessor.runScript(ScriptProcessor.java:267)
-	com.glide.processors.ScriptProcessor.process(ScriptProcessor.java:225)
-	com.glide.processors.AProcessor.runProcessor(AProcessor.java:891)
-	com.glide.processors.AProcessor.processTransaction(AProcessor.java:346)
-	com.glide.processors.ProcessorRegistry.process0(ProcessorRegistry.java:187)
-	com.glide.processors.ProcessorRegistry.process(ProcessorRegistry.java:175)
-	com.glide.ui.GlideServletTransaction.process(GlideServletTransaction.java:58)
-	com.glide.sys.Transaction.run(Transaction.java:3086)
-	com.glide.ui.HTTPTransaction.run(HTTPTransaction.java:34)
-	java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-	java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-	java.base/java.lang.Thread.run(Thread.java:841)
+(function runTransformScript(source, map, log, target) {
+    var code = source.getValue('u_alarm_code');
+    var pw = source.getValue('u_alarm_password');
+    gs.info('XF >> src code=[' + code + '] pw=[' + pw + ']');
 
-Background message, type:error, message: Function getFields is not allowed in scope x_banun_bunow_al_0
+    var sysId = target.getUniqueValue();
+    gs.info('XF >> target=' + sysId);
+
+    var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    if (!gr.get(sysId)) {
+        gs.info('XF >> target not found');
+        return;
+    }
+
+    if (code)
+        gr.setValue('alarm_code', code);
+    if (pw)
+        gr.setValue('alarm_password', pw);
+    gr.setWorkflow(false);
+    gr.update();
+
+    var check = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
+    check.get(sysId);
+    gs.info('XF >> readback code=[' + check.getDisplayValue('alarm_code') +
+            '] pw=[' + check.getDisplayValue('alarm_password') + ']');
+})(source, map, log, target);
