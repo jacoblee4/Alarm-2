@@ -1,5 +1,7 @@
-x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[e3c223d1a47e83506d754bdd05518972]
-x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[6fc223d1a47e83506d754bdd05518975]
-x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[5c53eb15a47e83506d754bdd0551899c]
-x_banun_bunow_al_0: ROW >> state=[error] comment=[null] target=[6c53eb15a47e83506d754bdd0551899e]
-x_banun_bunow_al_0: ROW >> state=[inserted] comment=[null] target=[247b0361a4be87506d754bdd055189d0]
+var gr = new GlideRecord('sys_import_log');
+gr.orderByDesc('sys_created_on');
+gr.setLimit(20);
+gr.query();
+while (gr.next()) {
+    gs.info('LOG >> [' + gr.getValue('level') + '] ' + gr.getValue('message'));
+}
