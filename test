@@ -1,18 +1,11 @@
 var imp = new GlideRecord('x_banun_bunow_al_0_alarm_codes_import');
 imp.addQuery('sys_import_state', 'inserted');
 imp.query();
-
-var ok = 0, bad = 0;
 while (imp.next()) {
     var gr = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    if (!gr.get(imp.getValue('sys_target_sys_id'))) { bad++; continue; }
-
+    if (!gr.get(imp.getValue('sys_target_sys_id')))
+        continue;
     gr.setValue('alarm_code', imp.getValue('u_alarm_code'));
     gr.setValue('alarm_password', imp.getValue('u_alarm_password'));
     gr.update();
-
-    var c = new GlideRecord('x_banun_bunow_al_0_alarm_codes');
-    c.get(gr.getUniqueValue());
-    c.getDisplayValue('alarm_password') ? ok++ : bad++;
 }
-gs.info('DONE >> ok=' + ok + ' bad=' + bad);
